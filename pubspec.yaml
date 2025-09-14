@@ -1,0 +1,60 @@
+name: stylish
+description: "This is a little test task for Eclipt AI"
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  meta: ^1.16.0
+  logging: ^1.3.0
+  shared_preferences: ^2.5.3
+  octopus: ^0.0.9
+  provider: ^6.1.5+1
+  flutter_bloc: ^9.1.1
+  flutter_native_splash: ^2.4.6
+  flutter_svg: ^2.2.1
+  firebase_core: ^4.1.0
+  firebase_auth: ^6.0.2
+  cloud_firestore: ^6.0.1
+  google_fonts: ^6.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  change_app_package_name: ^1.4.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/core/
+    - assets/images/onboarding/
+    - assets/images/home/
+    
+  fonts:
+    - family: CustomIcons
+      fonts:
+       - asset: assets/fonts/CustomIcons.ttf
+
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: false
+  image_path: "assets/images/core/logo.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/core/logo.png"
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/images/core/logo_with_name.png
+
+  android_12:
+    color: "#FFFFFF"
+    image: assets/images/core/logo_with_name.png
