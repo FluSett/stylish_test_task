@@ -9,7 +9,7 @@ This is a little test task for Eclipt AI
 #### **Prerequisites**
 
 * **Flutter SDK:** [Link to Flutter installation guide](https://flutter.dev/docs/get-started/install)
-* [Any other dependencies, like Android Studio, Xcode, or a specific version of a library]
+* You may also need other dependencies, such as Android Studio, JAVA or a specific version of a library. The Flutter documentation will help you with this
 
 #### **Build and Run**
 
