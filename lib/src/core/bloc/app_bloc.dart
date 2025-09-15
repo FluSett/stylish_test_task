@@ -22,12 +22,14 @@ final class AppInitializeEvent extends AppEvent {
 @immutable
 final class AppState {
   const AppState({
+    this.isInitialized = false,
     this.initializationStep = 0,
     final AuthenticationRepository? authenticationRepository,
     final ProfileRepository? profileRepository,
   }) : authenticationRepositoryOrNull = authenticationRepository,
        profileRepositoryOrNull = profileRepository;
 
+  final bool isInitialized;
   final int initializationStep;
   final AuthenticationRepository? authenticationRepositoryOrNull;
   final ProfileRepository? profileRepositoryOrNull;
@@ -40,10 +42,12 @@ final class AppState {
       profileRepositoryOrNull == null ? throw ArgumentError('No ProfileRepository') : profileRepositoryOrNull!;
 
   AppState copyWith({
+    final bool? isInitialized,
     final int? initializationStep,
     final AuthenticationRepository? authenticationRepository,
     final ProfileRepository? profileRepository,
   }) => AppState(
+    isInitialized: isInitialized ?? this.isInitialized,
     initializationStep: initializationStep ?? this.initializationStep,
     authenticationRepository: authenticationRepository ?? authenticationRepositoryOrNull,
     profileRepository: profileRepository ?? profileRepositoryOrNull,
@@ -55,19 +59,9 @@ final class AppBloc extends Bloc<AppEvent, AppState> {
     on<AppInitializeEvent>(_onInitializeApp);
   }
 
-  final _isInitializedNotifier = ValueNotifier<bool>(false);
-
-  ValueListenable<bool> get isInitializedListenable => _isInitializedNotifier;
-
-  @override
-  Future<void> close() async {
-    _isInitializedNotifier.dispose();
-    await super.close();
-  }
-
   Future<void> _onInitializeApp(final AppInitializeEvent event, final Emitter<AppState> emit) async {
     try {
-      _isInitializedNotifier.value = false;
+      emit(state.copyWith(isInitialized: false));
       final stopwatch = Stopwatch()..start();
 
       await _initializeDependencies(emit);
@@ -75,7 +69,7 @@ final class AppBloc extends Bloc<AppEvent, AppState> {
       logger.info('Initialization time: ${stopwatch.elapsed}');
 
       stopwatch.stop();
-      _isInitializedNotifier.value = true;
+      emit(state.copyWith(isInitialized: true));
     } on Object catch (error, stackTrace) {
       logger.severe('Failed to initialize app (${state.initializationStep})', error, stackTrace);
     }

@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 31),
             BlocSelector<AuthenticationBloc, AuthenticationState, bool>(
-              selector: (state) => state.requestStatus.isIdle || state.requestStatus.isError,
+              selector: (state) => !state.requestStatus.isProcessing,
               builder: (context, isReady) => ElevatedButton(
                 key: ValueKey('LoginButton-$isReady'),
                 onPressed: isReady ? () => _login(context) : null,
