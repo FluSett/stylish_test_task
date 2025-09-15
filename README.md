@@ -1,7 +1,7 @@
 # Stylish
 
 This is a little test task for Eclipt AI
-
+The technical task and design are available at [this link](https://www.figma.com/design/nMisKpKLOZLnJsUHQVn0ow/Eclipt-Test-Task?m=auto&t=716MVrBU9bnJP6Sv-6)
 ---
 
 ### **Getting Started**
