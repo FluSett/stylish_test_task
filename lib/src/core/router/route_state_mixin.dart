@@ -1,50 +1,52 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:async';
+
+import 'package:flutter/widgets.dart';
 import 'package:octopus/octopus.dart';
-import 'package:stylish/src/core/bloc/app_bloc.dart';
+import 'package:stylish/src/core/bloc/router_cubit.dart';
+import 'package:stylish/src/core/extension/build_context_extension.dart';
 import 'package:stylish/src/core/router/route_guard.dart';
 import 'package:stylish/src/core/router/routes.dart';
-import 'package:stylish/src/feature/authentication/bloc/authentication_bloc.dart';
 import 'package:stylish/src/feature/not_found/widget/not_found_screen.dart';
-import 'package:stylish/src/feature/profile/bloc/profile_bloc.dart';
 
-@immutable
-final class RouterUtil {
-  static final _errorsObserver = ValueNotifier<List<({Object error, StackTrace stackTrace})>>(
+mixin RouterStateMixin<T extends StatefulWidget> on State<T> {
+  late final Octopus router;
+
+  final errorsObserver = ValueNotifier<List<({Object error, StackTrace stackTrace})>>(
     <({Object error, StackTrace stackTrace})>[],
   );
 
-  static Octopus getRouter(final BuildContext context) {
-    final isInitializedListenable = context.read<AppBloc>().isInitializedListenable;
-    ValueListenable<bool>? isAuthenticatedListenable;
-    ValueListenable<String>? userTextListenable;
+  StreamSubscription<RouterState>? _routerBlocSubscription;
+  final _routerStateNotifier = ValueNotifier<RouterState>(const RouterState());
 
-    try {
-      isAuthenticatedListenable = context.read<AuthenticationBloc>().isAuthenticatedListenable;
-    } on Object catch (_, _) {}
+  @override
+  void initState() {
+    super.initState();
 
-    try {
-      userTextListenable = context.read<ProfileBloc>().userTextListenable;
-    } on Object catch (_, _) {}
+    final routerBloc = context.tryReadBloc<RouterCubit>();
+    if (routerBloc != null) {
+      _routerStateNotifier.value = routerBloc.state;
+      _routerBlocSubscription?.cancel();
+      _routerBlocSubscription = routerBloc.stream.listen((state) => _routerStateNotifier.value = state);
+    }
 
-    return Octopus(
+    router = Octopus(
       routes: Routes.values,
       defaultRoute: Routes.splash,
       transitionDelegate: const DefaultTransitionDelegate<void>(),
-      guards: <IOctopusGuard>[
-        RouteGuard(
-          isInitializedListenable: isInitializedListenable,
-          isAuthenticatedListenable: isAuthenticatedListenable,
-          userTextListenable: userTextListenable,
-          refresh: Listenable.merge([isInitializedListenable, isAuthenticatedListenable, userTextListenable]),
-        ),
-      ],
-      onError: (final error, final stackTrace) => _errorsObserver.value = <({Object error, StackTrace stackTrace})>[
+      guards: <IOctopusGuard>[RouteGuard(getState: () => _routerStateNotifier.value, refresh: _routerStateNotifier)],
+      onError: (final error, final stackTrace) => errorsObserver.value = <({Object error, StackTrace stackTrace})>[
         (error: error, stackTrace: stackTrace),
-        ..._errorsObserver.value,
+        ...errorsObserver.value,
       ],
       notFound: (final _, final _, final _) => const NotFoundScreen(),
     );
+  }
+
+  @override
+  void dispose() {
+    _routerStateNotifier.dispose();
+    _routerBlocSubscription?.cancel();
+    _routerBlocSubscription = null;
+    super.dispose();
   }
 }

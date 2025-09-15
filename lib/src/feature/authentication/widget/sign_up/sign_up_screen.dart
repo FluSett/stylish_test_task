@@ -94,7 +94,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             const SizedBox(height: 31),
             BlocSelector<AuthenticationBloc, AuthenticationState, bool>(
-              selector: (state) => state.requestStatus.isIdle || state.requestStatus.isError,
+              selector: (state) => !state.requestStatus.isProcessing,
               builder: (context, isReady) => ElevatedButton(
                 key: ValueKey('SignUpButton-$isReady'),
                 onPressed: isReady ? () => _signUp(context) : null,

@@ -57,16 +57,12 @@ final class AuthenticationLogoutEvent extends AuthenticationEvent {
 
 @immutable
 final class AuthenticationState {
-  const AuthenticationState({this.requestStatus = RequestStatuses.idle, this.isAuthenticated = false});
+  const AuthenticationState({this.requestStatus = RequestStatuses.idle});
 
   final RequestStatuses requestStatus;
-  final bool isAuthenticated;
 
-  AuthenticationState copyWith({final RequestStatuses? requestStatus, final bool? isAuthenticated}) =>
-      AuthenticationState(
-        requestStatus: requestStatus ?? this.requestStatus,
-        isAuthenticated: isAuthenticated ?? this.isAuthenticated,
-      );
+  AuthenticationState copyWith({final RequestStatuses? requestStatus}) =>
+      AuthenticationState(requestStatus: requestStatus ?? this.requestStatus);
 }
 
 final class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> {
@@ -74,33 +70,9 @@ final class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationS
     on<AuthenticationLoginEvent>(_login);
     on<AuthenticationSignUpEvent>(_signUp);
     on<AuthenticationLogoutEvent>(_logout);
-    _initialize();
   }
 
   final AuthenticationRepository _authenticationRepository;
-
-  StreamSubscription<bool>? _authenticationSubscription;
-  final _isAuthenticatedNotifier = ValueNotifier<bool>(false);
-  ValueListenable<bool> get isAuthenticatedListenable => _isAuthenticatedNotifier;
-
-  @override
-  Future<void> close() async {
-    await _authenticationSubscription?.cancel();
-    _authenticationSubscription = null;
-    _isAuthenticatedNotifier.dispose();
-    await super.close();
-  }
-
-  Future<void> _initialize() async {
-    await _authenticationSubscription?.cancel();
-    _authenticationSubscription = null;
-
-    _authenticationSubscription = _authenticationRepository.isAuthenticatedChanges().listen((final value) {
-      _isAuthenticatedNotifier.value = value;
-      // ignore: invalid_use_of_visible_for_testing_member
-      emit(state.copyWith(isAuthenticated: value));
-    });
-  }
 
   Future<void> _login(final AuthenticationLoginEvent event, final Emitter<AuthenticationState> emit) async {
     try {
@@ -124,7 +96,6 @@ final class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationS
       logger.severe('Failed to login via Firebase', error, stackTrace);
       emit(state.copyWith(requestStatus: RequestStatuses.error));
       event.onError?.call(error.toString());
-      rethrow;
     }
   }
 
@@ -136,7 +107,6 @@ final class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationS
     } on Object catch (error, stackTrace) {
       logger.severe('Failed to logout', error, stackTrace);
       emit(state.copyWith(requestStatus: RequestStatuses.error));
-      rethrow;
     }
   }
 }

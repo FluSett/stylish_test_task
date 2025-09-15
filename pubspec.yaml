@@ -1,7 +1,7 @@
 name: stylish
 description: "This is a little test task for Eclipt AI"
 publish_to: 'none'
-version: 1.0.0
+version: 2.0.0
 
 environment:
   sdk: ^3.9.2

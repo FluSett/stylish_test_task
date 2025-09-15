@@ -69,9 +69,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text('You are signed in as:\n$email', textAlign: TextAlign.center, style: bodyTextStyle),
                   ),
                   const SizedBox(height: 12),
-                  ValueListenableBuilder<String>(
-                    valueListenable: context.read<ProfileBloc>().userTextListenable,
-                    builder: (final context, final userText, final _) =>
+                  BlocSelector<ProfileBloc, ProfileState, String>(
+                    selector: (final state) => state.userText,
+                    builder: (final context, final userText) =>
                         Text('Your text is::\n$userText', textAlign: TextAlign.center, style: bodyTextStyle),
                   ),
                   const Spacer(),

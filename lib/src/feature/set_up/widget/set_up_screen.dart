@@ -53,7 +53,7 @@ class _SetUpScreenState extends State<SetUpScreen> {
             ),
             const SizedBox(height: 31),
             BlocSelector<ProfileBloc, ProfileState, bool>(
-              selector: (state) => state.textStatus.isIdle || state.textStatus.isError,
+              selector: (state) => !state.userTextStatus.isProcessing,
               builder: (context, isReady) => ElevatedButton(
                 key: ValueKey('FinishButton-$isReady'),
                 onPressed: isReady ? () => _finish(context) : null,

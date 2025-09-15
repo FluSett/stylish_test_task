@@ -1,7 +1,5 @@
-// ignore_for_file: avoid_print
-
+import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
-import 'package:meta/meta.dart';
 
 final logger = Logger('ROOT');
 
@@ -11,11 +9,11 @@ class LoggerUtil {
     hierarchicalLoggingEnabled = true;
     logger.level = Level.ALL;
     logger.onRecord.listen((record) {
-      print('[${record.loggerName}][${record.level.name}]: ${record.message}');
+      debugPrint('[${record.loggerName}][${record.level.name}]: ${record.message}');
 
-      if (record.error != null) print('[Error]: ${record.error}');
+      if (record.error != null) debugPrint('[Error]: ${record.error}');
 
-      if (record.stackTrace != null) print('[StackTrace]: ${record.stackTrace}');
+      if (record.stackTrace != null) debugPrint('[StackTrace]: ${record.stackTrace}');
     });
   }
 }
